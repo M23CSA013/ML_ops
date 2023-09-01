@@ -22,13 +22,17 @@ for ax, image, label in zip(axes, digits.images, digits.target):
 n_samples = len(digits.images)
 data = digits.images.reshape((n_samples, -1))
 
-
+def train_dev_test_split(X, y, test_size, dev_size):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, shuffle = False)
 # Split data into 50% train and 50% test subsets
-X_train, X_test, y_train, y_test = train_test_split(
-    data, digits.target, test_size=0.5, shuffle=False
+    X_train, X_test, dev_train, dev_test = train_test_split(
+    X, y, test_size=dev_size, shuffle=False
 )
+    return X_train, X_test, y_train, y_test, dev_train, dev_test
 # Create a classifier: a support vector classifier
 clf = svm.SVC(gamma=0.001)
+
+X_train, X_test, y_train, y_test, dev_train, dev_test = train_dev_test_split(data, digits.target, 0.4, 0.4)
 
 # Learn the digits on the train subset
 clf.fit(X_train, y_train)
@@ -49,26 +53,26 @@ print(
     f"{metrics.classification_report(y_test, predicted)}\n"
 )
 
-disp = metrics.ConfusionMatrixDisplay.from_predictions(y_test, predicted)
-disp.figure_.suptitle("Confusion Matrix")
-print(f"Confusion matrix:\n{disp.confusion_matrix}")
+# disp = metrics.ConfusionMatrixDisplay.from_predictions(y_test, predicted)
+# disp.figure_.suptitle("Confusion Matrix")
+# print(f"Confusion matrix:\n{disp.confusion_matrix}")
 
 plt.show()
 
 # The ground truth and predicted lists
-y_true = []
-y_pred = []
-cm = disp.confusion_matrix
+# y_true = []
+# y_pred = []
+# cm = disp.confusion_matrix
 
 # For each cell in the confusion matrix, add the corresponding ground truths
 # and predictions to the lists
-for gt in range(len(cm)):
-    for pred in range(len(cm)):
-        y_true += [gt] * cm[gt][pred]
-        y_pred += [pred] * cm[gt][pred]
+# for gt in range(len(cm)):
+#     for pred in range(len(cm)):
+#         y_true += [gt] * cm[gt][pred]
+#         y_pred += [pred] * cm[gt][pred]
 
-print(
-    "Classification report rebuilt from confusion matrix:\n"
-    f"{metrics.classification_report(y_true, y_pred)}\n"
-)
+# print(
+#     "Classification report rebuilt from confusion matrix:\n"
+#     f"{metrics.classification_report(y_true, y_pred)}\n"
+# )
 
